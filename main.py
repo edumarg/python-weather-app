@@ -5,20 +5,22 @@ import json
 API_KEY = config('API_KEY')
 URL = config('URL')
 
-def get_weather_info(city):
-    weather_url = f'{URL}weather?q={city}&appid={API_KEY}&units=metric'
+
+def get_weather_info(city_name):
+    weather_url = f'{URL}weather?q={city_name}&appid={API_KEY}&units=metric'
     response = requests.get(url=weather_url)
     if response.status_code == 404:
         print("City not found")
-        return False
+        return
     if response.status_code == 200:
         return json.loads(response.content)
     if response.status_code == 429:
         print("Minute request limit reached...")
-        return False
+        return
     if response.status_code == 401:
         print("Please check you API and subscription status")
-        return False
+        return
+
 
 def get_wind_cardinal_direction(data):
     cardinal = ""
@@ -40,11 +42,12 @@ def get_wind_cardinal_direction(data):
         cardinal = "N"
     return cardinal
 
-def print_weather_info(city):
-    data = get_weather_info(city)
+
+def print_weather_info(city_name):
+    data = get_weather_info(city_name)
     if data:
         cardinal = get_wind_cardinal_direction(data)
-        print(f'Current Weather at {city.capitalize()}: \n' \
+        print(f'Current Weather at {city_name.capitalize()}: \n' \
               f'{data["weather"][0]["description"].capitalize()} \n' \
               f'Current Temperature: {data["main"]["temp"]}°C \n' \
               f'Temperature feels like: {data["main"]["feels_like"]}°C \n' \
@@ -58,6 +61,7 @@ def print_weather_info(city):
               f'\tDirection: {data["wind"]["deg"]}° {cardinal}')
     else:
         return
+
 
 if __name__ == '__main__':
     city = input("Please input city you wish to get weather information: ")
